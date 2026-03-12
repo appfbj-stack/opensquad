@@ -1,6 +1,6 @@
 # opensquad
 
-Crie squads de agentes de IA que trabalham juntos — direto do seu terminal.
+Crie squads de agentes de IA que trabalham juntos — direto da sua IDE.
 
 opensquad é um framework de orquestração multi-agente. Descreva o que você precisa em linguagem natural, e o opensquad cria uma equipe de agentes especializados que trabalham juntos automaticamente.
 
@@ -38,9 +38,26 @@ npx opensquad update
 | Claude Code | Disponível |
 | Codex (OpenAI) | Disponível |
 | Open Code | Disponível |
-| Cursor | Em breve |
-| Windsurf | Em breve |
-| VS Code + Copilot | Em breve |
+| Cursor | Disponível |
+| VS Code + Copilot | Disponível |
+
+## Escritório Virtual
+
+O Escritório Virtual é uma interface visual 2D que mostra seus agentes trabalhando em tempo real.
+
+**Passo 1 — Gere o dashboard** (na sua IDE):
+
+```
+/opensquad dashboard
+```
+
+**Passo 2 — Sirva localmente** (no terminal):
+
+```bash
+npx serve squads/<nome-do-squad>/dashboard
+```
+
+**Passo 3 —** Abra `http://localhost:3000` no seu navegador.
 
 ## Criando seu Squad
 
@@ -98,7 +115,7 @@ MIT — use como quiser.
 
 # opensquad (English)
 
-Create AI squads that work together — right from your terminal.
+Create AI squads that work together — right from your IDE.
 
 opensquad is a multi-agent orchestration framework. Describe what you need in plain language, and opensquad creates a team of specialized agents that work together automatically.
 
@@ -135,9 +152,26 @@ npx opensquad update
 | Claude Code | Available |
 | Codex (OpenAI) | Available |
 | Open Code | Available |
-| Cursor | Coming soon |
-| Windsurf | Coming soon |
-| VS Code + Copilot | Coming soon |
+| Cursor | Available |
+| VS Code + Copilot | Available |
+
+## Virtual Office
+
+The Virtual Office is a 2D visual interface that shows your agents working in real time.
+
+**Step 1 — Generate the dashboard** (in your IDE):
+
+```
+/opensquad dashboard
+```
+
+**Step 2 — Serve it locally** (in terminal):
+
+```bash
+npx serve squads/<squad-name>/dashboard
+```
+
+**Step 3 —** Open `http://localhost:3000` in your browser.
 
 ## Creating your Squad
 

@@ -482,7 +482,7 @@ agent:
            ```yaml
            ---
            type: checkpoint
-           outputFile: squads/{code}/pipeline/data/research-focus.md
+           outputFile: squads/{code}/output/research-focus.md
            ---
            ```
          - The checkpoint body MUST:
@@ -497,7 +497,7 @@ agent:
               3. Último mês
               4. Sem restrição de tempo (evergreen)
          - The researcher step immediately after MUST have:
-           `inputFile: squads/{code}/pipeline/data/research-focus.md`
+           `inputFile: squads/{code}/output/research-focus.md`
          - Pipeline Runner writes the user's response to `research-focus.md` automatically.
          - Exception: omit this checkpoint only when the research source is fixed and known
            at squad creation time (e.g., an analyst reading a specific uploaded file —
@@ -880,8 +880,12 @@ agent:
       format: {format-id}   # OPTIONAL — e.g., "instagram-feed". Pipeline Runner auto-injects from _opensquad/core/best-practices/
                             # Use for content creation steps where platform-specific rules should guide the agent
                             # Omit for non-content steps (research, analysis, review without platform context)
-      inputFile: squads/{code}/...   # path to input file from previous step
-      outputFile: squads/{code}/...  # path where this step saves its output
+      inputFile: squads/{code}/output/{filename}.{ext}   # path to input file from previous step — MUST use output/ prefix
+      outputFile: squads/{code}/output/{filename}.{ext}  # path where this step saves its output — MUST use output/ prefix
+                                                          # NEVER use pipeline/data/ for outputFile — that folder is for static
+                                                          # reference materials only. The Pipeline Runner's path transformation
+                                                          # only applies to paths starting with squads/{code}/output/,
+                                                          # so any path outside output/ will bypass run_id scoping entirely.
       model_tier: fast      # ONLY for execution: subagent. fast = lightweight model; powerful = default model
                             # Set fast for: investigator agents (data extraction, Sherlock subagents)
                             # Set powerful for: writer, creator, reviewer, strategy, researcher agents
@@ -900,11 +904,12 @@ agent:
       ```yaml
       ---
       type: checkpoint
-      outputFile: squads/{code}/pipeline/data/research-focus.md
+      outputFile: squads/{code}/output/research-focus.md
       ---
       ```
       The Pipeline Runner writes the user's response to this file before proceeding.
-      The next step (researcher) reads it as `inputFile`.
+      The next step (researcher) reads it as `inputFile: squads/{code}/output/research-focus.md`.
+      Using output/ ensures the path transformation applies and the file lands in the run_id folder.
 
       Every pipeline step file MUST contain ALL of the following sections. Target 60-120 lines per step.
 
