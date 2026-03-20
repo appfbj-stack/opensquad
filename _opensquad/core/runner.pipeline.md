@@ -145,7 +145,8 @@ When an agent's `.agent.md` frontmatter contains a `tasks:` field:
    e. Check task veto conditions (same enforcement as step veto conditions below)
 
 3. **Final output**: The output of the LAST task in the chain becomes the step's output
-   - Save to the step's outputFile path
+   - Apply the Output Path Transformation (Steps 1 and 2: run_id injection + version folder) to the `outputFile` path before saving — this applies regardless of whether the step runs as `execution: inline` or `execution: subagent`
+   - Save to the **transformed** outputFile path
    - This is what the next step (or checkpoint) receives
 
 4. **Progress reporting**: For inline execution, announce each task:
