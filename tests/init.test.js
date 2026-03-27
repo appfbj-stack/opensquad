@@ -509,3 +509,22 @@ test('init with cursor IDE creates .cursorignore with browser profile exclusion'
     await rm(tempDir, { recursive: true, force: true });
   }
 });
+
+test('init does not copy dashboard node_modules or dist to user project', async () => {
+  const tempDir = await mkdtemp(join(tmpdir(), 'opensquad-test-'));
+
+  try {
+    await init(tempDir, { _skipPrompts: true });
+
+    await assert.rejects(
+      stat(join(tempDir, 'dashboard', 'node_modules')),
+      { code: 'ENOENT' }
+    );
+    await assert.rejects(
+      stat(join(tempDir, 'dashboard', 'dist')),
+      { code: 'ENOENT' }
+    );
+  } finally {
+    await rm(tempDir, { recursive: true, force: true });
+  }
+});
