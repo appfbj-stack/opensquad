@@ -57,7 +57,7 @@ Parse user input and route to the appropriate action:
 |---------------|--------|
 | `/opensquad` or `/opensquad menu` | Show main menu |
 | `/opensquad help` | Show help text |
-| `/opensquad create <description>` | Load Architect → Create Squad flow (will ask for reference profile URLs for Sherlock investigation) |
+| `/opensquad create <description>` | Run Create Squad — Phased Orchestration flow |
 | `/opensquad list` | List all squads in `squads/` directory |
 | `/opensquad run <name>` | Load Pipeline Runner → Execute squad |
 | `/opensquad edit <name> <changes>` | Load Architect → Edit Squad flow |
@@ -70,6 +70,82 @@ Parse user input and route to the appropriate action:
 | `/opensquad settings` | Show/edit preferences.md |
 | `/opensquad reset` | Confirm and reset all configuration |
 | Natural language about squads | Infer intent and route accordingly |
+
+## Create Squad — Phased Orchestration
+
+When the user runs `/opensquad create`:
+
+### Phase 1: Discovery
+
+1. Check resume: does `squads/{name}/_build/discovery.yaml` already exist?
+   - If yes: read it, show summary, ask user to continue or redo
+   - If no: proceed with discovery
+
+2. Dispatch Discovery subagent:
+   - Read `_opensquad/core/prompts/discovery.prompt.md`
+   - Also provide: `_opensquad/_memory/company.md`, `_opensquad/_memory/preferences.md`
+   - Follow the discovery prompt instructions (intelligent wizard, one question at a time)
+   - Output: `squads/{code}/_build/discovery.yaml`
+
+3. Validate: `discovery.yaml` exists and has required fields (purpose, domain, performance_mode)
+
+### Phase 2: Investigation (optional)
+
+Read `discovery.yaml` to check `investigation.mode`:
+
+**If `mode: sherlock`:**
+For each target in `investigation.targets`:
+   1. Detect platform from URL
+   2. Dispatch Sherlock subagent with:
+      - `_opensquad/core/prompts/sherlock-shared.md`
+      - `_opensquad/core/prompts/sherlock-{platform}.md` (platform-specific extractor)
+      - URL, investigation_mode, output directory, squad name
+   3. Use fast model tier for Sherlock subagents
+   4. Subagents can run in parallel (one per URL)
+   5. Wait for all to complete
+   6. Validate per target: `raw-content.md` OR `error.md` exists
+   7. If any target has `error.md`: inform user, ask to retry or skip
+
+**If `mode: manual`:**
+   1. Ask user to paste reference content
+   2. Save to `squads/{code}/_investigations/manual/raw-content.md`
+
+**If `mode: none`:** Skip to Phase 3
+
+### Phase 3: Design
+
+1. Check resume: does `squads/{code}/_build/design.yaml` already exist?
+   - If yes: read it, show summary, ask user to continue or redo
+
+2. Dispatch Design subagent:
+   - Read `_opensquad/core/prompts/design.prompt.md`
+   - Provide: path to discovery.yaml, paths to investigation results (if any)
+   - The Design phase handles: best-practices consultation, web research, extraction, skill discovery, design presentation
+   - Output: `squads/{code}/_build/design.yaml`
+
+3. Validate: `design.yaml` exists and has agents and pipeline defined
+
+### Phase 4: Build
+
+1. Dispatch Build subagent:
+   - Read `_opensquad/core/prompts/build.prompt.md`
+   - Provide: path to design.yaml, path to discovery.yaml
+   - The Build phase generates all files and runs validation gates
+   - Output: `squads/{code}/squad.yaml` + all agent and pipeline files
+
+2. Final validation:
+   - `squad.yaml` exists
+   - All agent files referenced in squad-party.csv exist
+   - All pipeline step files exist
+
+3. Present completion summary to user
+
+### Resume Support
+
+If `/opensquad create` is called and `_build/` artifacts exist from a previous session:
+- Discovery complete + Design missing → resume from Phase 3
+- Discovery + Design complete → resume from Phase 4
+- Show what was completed and ask user to continue or start over
 
 ## Help Text
 
@@ -106,7 +182,6 @@ SETTINGS
 
 EXAMPLES
   /opensquad create "Instagram carousel content production squad"
-    (provide reference profile URLs when asked for Sherlock investigation)
   /opensquad create "Weekly data analysis squad for Google Sheets"
   /opensquad create "Customer email response automation squad"
   /opensquad run my-squad
@@ -115,14 +190,14 @@ EXAMPLES
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-## Loading Agents
+## Loading Agents (for Squad Execution)
 
-When a specific agent needs to be activated (Architect, or any squad agent):
+When a specific squad agent needs to be activated during pipeline execution:
 
 1. Read the agent's `.agent.md` file completely (YAML frontmatter for metadata + markdown body for depth)
 2. Adopt the agent's persona (role, identity, communication_style, principles)
-3. Follow the agent's menu/workflow instructions
-4. When the agent's task is complete, return to Opensquad main context
+3. Follow the agent's workflow instructions
+4. When the agent's task is complete, return to pipeline context
 
 ## Loading the Pipeline Runner
 
