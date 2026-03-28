@@ -17,11 +17,11 @@ Before starting execution:
 
 1b. **Memory format migration** — After loading `memories.md`, check whether it uses the new format by scanning for the `## Estilo de Escrita` section header:
    ```bash
-   grep -q "## Estilo de Escrita" squads/{name}/_memory/memories.md && echo "NEW_FORMAT" || echo "OLD_FORMAT"
+   [ -f squads/{name}/_memory/memories.md ] && grep -q "## Estilo de Escrita" squads/{name}/_memory/memories.md && echo "NEW_FORMAT" || echo "OLD_FORMAT"
    ```
    - If `NEW_FORMAT` → proceed normally.
    - If `OLD_FORMAT` (or file is empty / does not exist) → silently migrate before proceeding:
-     a. Write `squads/{name}/_memory/memories.md` with the new empty-sections format:
+     a. Write `squads/{name}/_memory/memories.md` with the new empty-sections format (do NOT attempt to salvage content from the old file — reset unconditionally):
         ```markdown
         # Squad Memory: {squad-name}
 
@@ -35,6 +35,7 @@ Before starting execution:
 
         ## Técnico (específico do squad)
         ```
+        (Use the squad's display name for `{squad-name}`, and the squad code for `{name}` in file paths — they refer to the same squad.)
      b. Check if `squads/{name}/_memory/runs.md` exists:
         ```bash
         test -f squads/{name}/_memory/runs.md && echo "EXISTS" || echo "MISSING"
