@@ -242,7 +242,7 @@ with placeholders. 1 example acceptable if it is comprehensive; 2 preferred if s
 - **Depends on**: [other agents or data this agent requires]
 ```
 
-#### Agents WITH Tasks (Alta Performance mode)
+#### Agents WITH Tasks
 
 For agents that have `tasks:` in frontmatter:
 - **Keep**: Persona, Principles, Voice Guidance, Anti-Patterns, Quality Criteria, Integration
@@ -515,7 +515,6 @@ Quality Report:
 - Tasks: {N}/{N} passed completeness gate
 - Steps: {N}/{N} passed completeness gate
 - Pipeline: {coherence status}
-- Mode: {Alta Performance / Economico}
 - Research sources used: {count}
 - Reference materials generated: {count}
 - Formats assigned: {list of format IDs used in pipeline steps, if any}
