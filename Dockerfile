@@ -1,12 +1,18 @@
-FROM node:20-alpine
+FROM python:3.11-slim
 
 WORKDIR /app
 
-# Copy bot files
-COPY telegram-bot.js ./
-COPY bot-package.json ./package.json
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    git \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install dependencies
-RUN npm install
+# Copy requirements and install
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-CMD ["node", "telegram-bot.js"]
+# Copy bot
+COPY bot.py .
+
+CMD ["python", "-u", "bot.py"]
