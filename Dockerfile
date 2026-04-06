@@ -2,9 +2,11 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
+# Copy bot files
 COPY telegram-bot.js ./
+COPY bot-package.json ./package.json
 
-RUN npm install --production node-telegram-bot-api @google/generative-ai node-fetch
+# Install dependencies
+RUN npm install
 
 CMD ["node", "telegram-bot.js"]
